@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Fun Quiz Link Generator</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button, textarea { margin-top: 10px; padding: 8px; width: 100%; max-width: 500px; }
+    button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #45a049; }
+    .container { max-width: 600px; margin: auto; }
+    .feedback { font-weight: bold; margin-top: 10px; }
+</style>
+<script>
+    function getQueryParams() {
+        const params = {};
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.forEach((value, key) => {
+            params[key] = decodeURIComponent(value);
+        });
+        return params;
+    }
+
+    function checkAnswer() {
+        const userAnswer = document.getElementById("answer").value.trim();
+        if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+            window.location.href = redirectURL;
+        } else {
+            document.getElementById("feedback").textContent = "❌ Incorrect! Try again.";
+        }
+    }
+
+    function generateLink() {
+        const q = encodeURIComponent(document.getElementById("gen-question").value.trim());
+        const a = encodeURIComponent(document.getElementById("gen-answer").value.trim());
+        const url = encodeURIComponent(document.getElementById("gen-url").value.trim());
+        if (!q || !a || !url) {
+            alert("Please fill all fields!");
+            return;
+        }
+        const base = window.location.origin + window.location.pathname;
+        const link = `${base}?q=${q}&a=${a}&url=${url}`;
+        document.getElementById("generated-link").value = link;
+    }
+
+    let correctAnswer = "";
+    let redirectURL = "";
+
+    window.onload = () => {
+        const params = getQueryParams();
+        if (params.q && params.a && params.url) {
+            // Show quiz mode
+            document.getElementById("generator").style.display = "none";
+            document.getElementById("quiz").style.display = "block";
+            document.getElementById("question").textContent = params.q;
+            correctAnswer = params.a;
+            redirectURL = params.url;
+        } else {
+            // Show generator mode
+            document.getElementById("generator").style.display = "block";
+            document.getElementById("quiz").style.display = "none";
+        }
+    }
+</script>
+</head>
+<body>
+<div class="container">
+
+    <!-- Generator Mode -->
+    <div id="generator">
+        <h2>🔗 Fun Quiz Link Generator</h2>
+        <p>Fill in the details and share the generated link with friends.</p>
+        <input type="text" id="gen-question" placeholder="I’m where your coffee brews, but today I hide your news.">
+        <input type="text" id="gen-answer" placeholder="Pantry Coffee Machine">
+        <input type="text" id="gen-url" placeholder="https://www.phishingbox.com/phishing-test">
+        <button onclick="generateLink()">Generate Link</button>
+        <textarea id="generated-link" readonly placeholder="Your link will appear here"></textarea>
+    </div>
+
+    <!-- Quiz Mode -->
+    <div id="quiz">
+        <h2 id="question">Loading...</h2>
+        <input type="text" id="answer" placeholder="Type your answer here">
+        <button onclick="checkAnswer()">Submit</button>
+        <p class="feedback" id="feedback" style="color:red;"></p>
+    </div>
+
+</div>
+</body>
+</html>
