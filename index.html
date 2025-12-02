@@ -29,8 +29,10 @@
     }
 
     function checkAnswer() {
-        const userAnswer = document.getElementById("answer").value.trim();
-        if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+        const userAnswer = document.getElementById("answer").value.trim().toLowerCase();
+
+        // Compare against allowed answers
+        if (acceptedAnswers.includes(userAnswer)) {
             window.location.href = redirectURL;
         } else {
             document.getElementById("feedback").textContent = "❌ Incorrect! Try again.";
@@ -41,29 +43,34 @@
         const q = encodeURIComponent(document.getElementById("gen-question").value.trim());
         const a = encodeURIComponent(document.getElementById("gen-answer").value.trim());
         const url = encodeURIComponent(document.getElementById("gen-url").value.trim());
+
         if (!q || !a || !url) {
             alert("Please fill all fields!");
             return;
         }
+
+        // Accept two possible answers separated by | (pipe), example: Password|Passcode
         const base = window.location.origin + window.location.pathname;
         const link = `${base}?q=${q}&a=${a}&url=${url}`;
         document.getElementById("generated-link").value = link;
     }
 
-    let correctAnswer = "";
+    let acceptedAnswers = [];
     let redirectURL = "";
 
     window.onload = () => {
         const params = getQueryParams();
+
         if (params.q && params.a && params.url) {
-            // Show quiz mode
             document.getElementById("generator").style.display = "none";
             document.getElementById("quiz").style.display = "block";
             document.getElementById("question").textContent = params.q;
-            correctAnswer = params.a;
+
+            // Allow two possible answers separated by "|"
+            acceptedAnswers = params.a.split("|").map(ans => ans.trim().toLowerCase());
             redirectURL = params.url;
+
         } else {
-            // Show generator mode
             document.getElementById("generator").style.display = "block";
             document.getElementById("quiz").style.display = "none";
         }
@@ -95,6 +102,7 @@
 </div>
 </body>
 </html>
+
 
 
 
